@@ -39,4 +39,9 @@ public class PastController {
     public ResponseEntity<PastDTO> getById(@PathVariable String id){
         return ResponseEntity.ok(pastService.getById(id));
     }
+
+    @GetMapping("/search")
+    public List<PastDTO> search(@RequestParam(required = false) String title, @RequestParam(required = false) String body){
+        return pastService.search(title, body);
+    }
 }

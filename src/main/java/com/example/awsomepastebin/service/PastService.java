@@ -6,11 +6,12 @@ import com.example.awsomepastebin.dto.LinkDTO;
 import com.example.awsomepastebin.dto.PastInfo;
 import com.example.awsomepastebin.enums.ExpiryDate;
 import com.example.awsomepastebin.enums.Status;
-import com.example.awsomepastebin.exception.IncorrectArgumentException;
+import com.example.awsomepastebin.exception.IncorrectParamException;
 import com.example.awsomepastebin.model.Past;
-import com.example.awsomepastebin.projection.LinkAndTitleView;
 import com.example.awsomepastebin.projection.PastTitleAndBodyView;
 import com.example.awsomepastebin.repository.PastRepos;
+import com.example.awsomepastebin.repository.specification.PastSpecification;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -51,8 +52,14 @@ public class PastService {
     public PastDTO getById(String id){
         PastTitleAndBodyView past = pastRepos.findPastById(id);
         if (past == null){
-            throw new IncorrectArgumentException();
+            throw new IncorrectParamException();
         }
         return past.to();
+    }
+
+
+    public List<PastDTO> search(String title, String body) {
+        List<Past> pasts = pastRepos.findAll(PastSpecification.byTitle(title).and(PastSpecification.byBody(body)));
+        return pasts.stream().map(PastDTO::from).collect(Collectors.toList());
     }
 }
