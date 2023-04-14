@@ -1,10 +1,11 @@
 package com.example.awsomepastebin.repository;
 
+import com.example.awsomepastebin.enums.Status;
 import com.example.awsomepastebin.model.Past;
-import com.example.awsomepastebin.projection.PastTitleAndBodyView;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -13,9 +14,13 @@ import java.util.UUID;
 
 @Repository
 public interface PastRepos extends JpaRepository<Past, UUID>, JpaSpecificationExecutor<Past> {
-    PastTitleAndBodyView findPastById(String id);
+    Past findPastById(String id);
 
-    List<Past> findAll(Specification<Past> specification);
+    List<Past> findAllByTitleContainsIgnoreCaseOrBodyContainsIgnoreCaseAndStatusAndExpiryDateIsAfter(String title, String text, Status status, Instant instant);
 
-    void deleteAllByExpiryDateIsBefore(Instant now);
+    @Modifying
+    @Query(value="delete from Past p where p.expiryDate < now()")
+    void deleteAll(Instant now);
+
+    List<Past> findTop10ByStatusAndExpiryDateIsAfterOrderByDateCreateDesc(Status status, Instant instant);
 }

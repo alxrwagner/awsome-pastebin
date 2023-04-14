@@ -17,10 +17,10 @@ public class RemovePast {
         this.pastRepos = pastRepos;
     }
 
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(cron = "0 0 0 * * ?")
     @Transactional
     public void clearTokens(){
         log.info("Removing pasts");
-        pastRepos.deleteAllByExpiryDateIsBefore(Instant.now());
+        pastRepos.deleteAll(Instant.now());
     }
 }
