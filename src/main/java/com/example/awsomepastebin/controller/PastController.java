@@ -1,8 +1,8 @@
 package com.example.awsomepastebin.controller;
 
 import com.example.awsomepastebin.dto.CreatePastDTO;
-import com.example.awsomepastebin.dto.PastDTO;
 import com.example.awsomepastebin.dto.LinkDTO;
+import com.example.awsomepastebin.dto.PastDTO;
 import com.example.awsomepastebin.dto.PastInfo;
 import com.example.awsomepastebin.enums.ExpiryDate;
 import com.example.awsomepastebin.enums.Status;
@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/my-awesome-pastebin.tld")

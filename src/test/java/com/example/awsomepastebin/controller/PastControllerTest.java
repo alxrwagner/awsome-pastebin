@@ -1,7 +1,9 @@
 package com.example.awsomepastebin.controller;
 
+import com.example.awsomepastebin.enums.Status;
 import com.example.awsomepastebin.model.Past;
 import com.example.awsomepastebin.repository.PastRepos;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
@@ -13,6 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,16 +42,19 @@ class PastControllerTest {
 
     @BeforeEach
     void setUp() throws JSONException {
+        past1 = new Past();
         past1.setTitle("title1");
         past1.setBody("body1");
-        pastRepos.save(past1);
+        String id1 = pastRepos.save(past1).getId();
 
-        past1.setTitle("title2");
-        past1.setBody("body2");
-        pastRepos.save(past2);
+        past2 = new Past();
+        past2.setTitle("title2");
+        past2.setBody("body2");
+        past2.setStatus(Status.PUBLIC);
 
         past3.put("title", "title3");
         past3.put("body", "body3");
+        past3.put("status", "PUBLIC");
     }
 
     @AfterEach
@@ -55,21 +62,20 @@ class PastControllerTest {
         pastRepos.deleteAll();
     }
 
+    public static String asJsonString(final Past past) {
+        try {
+            return new ObjectMapper().writeValueAsString(past);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
     @Test
     void create() throws Exception {
         mockMvc.perform(post("/my-awesome-pastebin.tld/save")
-                .contentType(MediaType.APPLICATION_JSON)
-                        .content(past3.toString()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(past2)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.id").isString())
-                .andExpect(jsonPath("$.title").value("title3"));
-
-//        mockMvc.perform(get("//my-awesome-pastebin.tld/id=" + ))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$").isArray())
-//                .andExpect(jsonPath("$.length()").value(2))
-//                .andExpect(jsonPath("$[1].name").value("test_name"));
+                .andExpect(jsonPath("$.title").value(past2.getTitle()));
     }
 
     @Test

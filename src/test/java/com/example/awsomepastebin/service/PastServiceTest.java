@@ -13,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,20 +49,6 @@ public class PastServiceTest {
         verify(pastReposMock).save(testPast1);
     }
 
-//    @Test
-//    void getTenLast() {
-////        List<PastInfo> testList = new ArrayList<>();
-////        testList.add(PastInfo.from(testPast1));
-////        testList.add(PastInfo.from(testPast2));
-//
-//        pastReposMock.save(testPast1);
-//        pastReposMock.save(testPast2);
-//
-//
-//        Assertions.assertEquals(1, pastService.getTenLast().size());
-//    }
-
-
     @Test
     void getById() {
         testPast1.setId("123");
@@ -77,8 +65,9 @@ public class PastServiceTest {
     @Test
     void search() {
         List<Past> testList = new ArrayList<>();
+        testPast1.setExpiryDate(Instant.now().plus(10, ChronoUnit.MINUTES));
         testList.add(testPast1);
-        when(pastReposMock.findAllByTitleContainsIgnoreCaseOrBodyContainsIgnoreCaseAndStatus("title1", "body1", Status.PUBLIC)).thenReturn(testList);
+        when(pastReposMock.findAllByTitleOrBody(Status.PUBLIC,"title1", "body1")).thenReturn(testList);
         List<PastDTO> pastsDTO = pastService.search("title1", "body1");
 
         Assertions.assertEquals(testList.size(), pastsDTO.size());

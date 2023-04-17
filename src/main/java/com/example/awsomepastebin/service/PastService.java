@@ -11,23 +11,20 @@ import com.example.awsomepastebin.model.Past;
 import com.example.awsomepastebin.repository.PastRepos;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
 public class PastService {
 
     private final PastRepos pastRepos;
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final String alphabet;
 
     public PastService(PastRepos pastRepos) {
         this.pastRepos = pastRepos;
+        this.alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890!@#$%&";
     }
 
     public LinkDTO save(Status status, ExpiryDate expiryDate, CreatePastDTO createPastDTO) {
@@ -35,7 +32,7 @@ public class PastService {
         past.setDateCreate(Instant.now());
         past.setStatus(status);
         past.setExpiryDate(expiryDate.getDate());
-        past.setId(UUID.randomUUID().toString().substring(0, 7));
+        past.setId(generateId(8));
         createPastDTO.setLink("/my-awesome-pastebin.tld/" + past.getId());
         pastRepos.save(past);
         return LinkDTO.fromCreatePastDTO(createPastDTO);
@@ -56,7 +53,20 @@ public class PastService {
 
 
     public List<PastDTO> search(String title, String body) {
-        List<Past> pasts = pastRepos.findAllByTitleContainsIgnoreCaseOrBodyContainsIgnoreCaseAndStatusAndExpiryDateIsAfter(title, body, Status.PUBLIC, Instant.now());
-        return pasts.stream().map(PastDTO::from).collect(Collectors.toList());
+            return pastRepos.findAllByTitleOrBody(Status.PUBLIC, title, body)
+                    .stream()
+                    .map(PastDTO::from)
+                    .collect(Collectors.toList());
+    }
+
+
+    private String generateId(int lengthLink){
+        Random random = new Random();
+        StringBuilder id = new StringBuilder();
+
+        for(int i = 0; i < lengthLink; i++){
+            id.append(alphabet.toCharArray()[random.nextInt(alphabet.length())]);
+        }
+        return id.toString();
     }
 }

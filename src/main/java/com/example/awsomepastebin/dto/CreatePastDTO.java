@@ -13,15 +13,6 @@ public class CreatePastDTO {
     @JsonIgnore
     private String link;
 
-//    public static CreatePastDTO from(Past past){
-//        CreatePastDTO = new CreatePastDTO();
-//        createPastDTO.setStatus(past.getStatus());
-//        createPastDTO.setTitle(past.getTitle());
-//        createPastDTO.setBody(past.getBody());
-//        createPastDTO.setExpiryDate(ExpiryDate.valueOf(past.getExpiryDate().toString()));
-//        return createPastDTO;
-//    }
-
     public Past to(){
         Past past = new Past();
         past.setTitle(getTitle());
