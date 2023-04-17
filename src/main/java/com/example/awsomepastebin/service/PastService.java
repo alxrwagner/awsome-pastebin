@@ -4,9 +4,9 @@ import com.example.awsomepastebin.dto.CreatePastDTO;
 import com.example.awsomepastebin.dto.LinkDTO;
 import com.example.awsomepastebin.dto.PastDTO;
 import com.example.awsomepastebin.dto.PastInfo;
-import com.example.awsomepastebin.enums.ExpiryDate;
 import com.example.awsomepastebin.enums.Status;
 import com.example.awsomepastebin.exception.IncorrectParamException;
+import com.example.awsomepastebin.exception.PastNotFoundException;
 import com.example.awsomepastebin.model.Past;
 import com.example.awsomepastebin.repository.PastRepos;
 import org.springframework.stereotype.Service;
@@ -27,11 +27,11 @@ public class PastService {
         this.alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890!@#$%&";
     }
 
-    public LinkDTO save(Status status, ExpiryDate expiryDate, CreatePastDTO createPastDTO) {
+    public LinkDTO save(CreatePastDTO createPastDTO) {
         Past past = createPastDTO.to();
         past.setDateCreate(Instant.now());
-        past.setStatus(status);
-        past.setExpiryDate(expiryDate.getDate());
+        past.setStatus(createPastDTO.getStatus());
+        past.setExpiryDate(createPastDTO.getExpiryDate().getDate());
         past.setId(generateId(8));
         createPastDTO.setLink("/my-awesome-pastebin.tld/" + past.getId());
         pastRepos.save(past);
@@ -44,13 +44,15 @@ public class PastService {
     }
 
     public PastDTO getById(String id){
+        if(id==null){
+            throw new IncorrectParamException();
+        }
         Past past = pastRepos.findPastById(id);
         if (past == null){
-            throw new IncorrectParamException();
+            throw new PastNotFoundException();
         }
         return PastDTO.from(past);
     }
-
 
     public List<PastDTO> search(String title, String body) {
             return pastRepos.findAllByTitleOrBody(Status.PUBLIC, title, body)
@@ -58,7 +60,6 @@ public class PastService {
                     .map(PastDTO::from)
                     .collect(Collectors.toList());
     }
-
 
     private String generateId(int lengthLink){
         Random random = new Random();

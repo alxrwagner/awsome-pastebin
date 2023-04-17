@@ -3,6 +3,7 @@ package com.example.awsomepastebin.service;
 import com.example.awsomepastebin.dto.PastDTO;
 import com.example.awsomepastebin.enums.Status;
 import com.example.awsomepastebin.exception.IncorrectParamException;
+import com.example.awsomepastebin.exception.PastNotFoundException;
 import com.example.awsomepastebin.model.Past;
 import com.example.awsomepastebin.repository.PastRepos;
 import org.junit.jupiter.api.Assertions;
@@ -59,7 +60,12 @@ public class PastServiceTest {
 
     @Test
     void getById_ifNotFound() {
-        Assertions.assertThrows(IncorrectParamException.class, () -> pastService.getById("qqq"));
+        Assertions.assertThrows(PastNotFoundException.class, () -> pastService.getById("qqq"));
+    }
+
+    @Test
+    void getById_ifIdIsNull() {
+        Assertions.assertThrows(IncorrectParamException.class, () -> pastService.getById(null));
     }
 
     @Test

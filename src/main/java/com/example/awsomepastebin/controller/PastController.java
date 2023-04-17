@@ -4,8 +4,6 @@ import com.example.awsomepastebin.dto.CreatePastDTO;
 import com.example.awsomepastebin.dto.LinkDTO;
 import com.example.awsomepastebin.dto.PastDTO;
 import com.example.awsomepastebin.dto.PastInfo;
-import com.example.awsomepastebin.enums.ExpiryDate;
-import com.example.awsomepastebin.enums.Status;
 import com.example.awsomepastebin.service.PastService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,10 +21,8 @@ public class PastController {
     }
 
     @PostMapping("/save")
-    public LinkDTO create(@RequestParam(name = "status") Status status,
-                                          @RequestParam(name = "expiry date") ExpiryDate expiryDate,
-                                          @RequestBody CreatePastDTO past){
-        return pastService.save(status, expiryDate, past);
+    public LinkDTO create(@RequestBody CreatePastDTO past){
+        return pastService.save(past);
     }
 
     @GetMapping("/last10")

@@ -10,6 +10,8 @@ import lombok.Data;
 public class CreatePastDTO {
     private String title;
     private String body;
+    private Status status;
+    private ExpiryDate expiryDate;
     @JsonIgnore
     private String link;
 

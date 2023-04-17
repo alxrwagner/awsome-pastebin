@@ -8,12 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 
 @Repository
 public interface PastRepos extends JpaRepository<Past, String> {
     Past findPastById(String id);
+
     @Modifying
     @Query(value="delete from Past p where p.expiryDate < now()")
     void deleteAll(Instant now);
